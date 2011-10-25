@@ -1,0 +1,20 @@
+-dontwarn
+-injars \cygwin\home\james\lib\scala-2.9.1.final\lib\scala-library.jar(!META-INF/MANIFEST.MF,!library.properties)
+-outjar proguard_cache/scala-library.CKSUM.jar
+-injars bin\classes
+-libraryjars \cygwin\home\james\lib\android-sdk-windows\platforms\android-14\android.jar
+
+-dontoptimize
+-dontobfuscate
+-dontskipnonpubliclibraryclasses
+-dontskipnonpubliclibraryclassmembers
+
+-keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+-keep public class com.restphone.* {
+    *;
+}
+-keep public class scala.App
+-keep public class scala.DelayedInit
+-keep public class scala.ScalaObject
+-keep public class scala.Function0, scala.Function1, scala.collection.mutable.ListBuffer
