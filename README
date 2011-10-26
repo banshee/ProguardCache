@@ -1,0 +1,23 @@
+SETUP
+
+---
+Copy the sample configuration to your project directory:
+
+cp ~/workspace/ProguardCache/proguard_android_scala.config.* .
+cp ~/workspace/ProguardCache/rakefile_sample.rb rakefile.rb
+
+---
+Download jruby, proguard, and asm
+
+jruby: http://www.jruby.org/download
+asm: http://forge.ow2.org/project/download.php?group_id=23&file_id=16019
+
+---
+Edit the proguard_android_scala.config file to point to your own code.
+
+---
+Run rake with CLASSPATH pointing to the jars for proguard and asm, and a -I option to the directory where you've installed ProguardCache:
+
+CLASSPATH=~/workspace/experiments/RubyProject jruby -I ~/workspace/ProguardCache -S rake -f rakefile.rb proguard[proguard_android_scala.config.unix,proguard_cache/scala-proguard.jar]
+
+(In my case, proguard.jar and asm.jar are both in ~/workspace/experiments/RubyProject)
