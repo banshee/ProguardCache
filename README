@@ -21,3 +21,8 @@ Run rake with CLASSPATH pointing to the jars for proguard and asm, and a -I opti
 CLASSPATH=~/workspace/experiments/RubyProject jruby -I ~/workspace/ProguardCache -S rake -f rakefile.rb proguard[proguard_android_scala.config.unix,proguard_cache/scala-proguard.jar]
 
 (In my case, proguard.jar and asm.jar are both in ~/workspace/experiments/RubyProject)
+
+---
+Source
+
+Complete source is available from https://github.com/banshee/ProguardCache
