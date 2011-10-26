@@ -1,3 +1,6 @@
+# This is just a sample.  The only thing ProguardCache cares about is that there
+# is one and only one outjar entry containing the string .CKSUM.
+
 -dontwarn
 -injars \cygwin\home\james\lib\scala-2.9.1.final\lib\scala-library.jar(!META-INF/MANIFEST.MF,!library.properties)
 -outjar proguard_cache/scala-library.CKSUM.jar
