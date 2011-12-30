@@ -14,9 +14,7 @@ Run rake with CLASSPATH pointing to the jars for proguard and asm, and a -I opti
 
 (Note that the square brackets are for passing arguments to rake.  They're not the standard notation for optional parameters.]
 
-CLASSPATH=~/workspace/experiments/RubyProject jruby -I ~/workspace/ProguardCache -S rake -f rakefile.rb proguard[proguard_android_scala.config.unix,proguard_cache/scala-proguard.jar]
-
-(In my case, proguard.jar and asm.jar are both in ~/workspace/experiments/RubyProject)
+CLASSPATH=~/workspace/experiments/RubyProject jruby -I ~/workspace/ProguardCache/src/main/jruby -S rake -f src/main/jruby/rakefile_sample.rb proguard[proguard_config/proguard_android_scala.config.unix,proguard_cache/scala-proguard.jar]
 
 ---
 Source
