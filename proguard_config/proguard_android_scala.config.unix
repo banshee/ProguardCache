@@ -1,12 +1,26 @@
-# This is just a sample.  The only thing ProguardCache cares about is that there
-# is one and only one outjar entry containing the string .CKSUM.
+# Sample Proguard config file for ProguardCache.
+#
+# For your configuration, change:
+#
+#   scala-library.jar
+#   outjar
+#   injars
+#   -keep for your own classes
 
--dontwarn
+
+# Change scala-library.jar to your scala library
 -injars /Users/james/lib/scala-2.9.1.final/lib/scala-library.jar(!META-INF/MANIFEST.MF,!library.properties)
+
+# Change where you want the output jar.  Note that CKSUM will be replace by an actual checksum
 -outjar ../ScalaSample/proguard_cache/scala-library.CKSUM.jar
+
+# Change injars to point to where you store your own .class files
 -injars bin
+
+# Point to your own android.jar file
 -libraryjars /Users/james/lib/android-sdk-mac_86/platforms/android-13/android.jar
 
+-dontwarn
 -dontoptimize
 -dontobfuscate
 -dontskipnonpubliclibraryclasses
@@ -14,9 +28,12 @@
 
 -keepattributes Exceptions,InnerClasses,Signature,Deprecated,
                 SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+
+# Change com.restphone to your own package
 -keep public class com.restphone.* {
     *;
 }
+
 -keep public class scala.App
 -keep public class scala.DelayedInit
 -keep public class scala.ScalaObject
