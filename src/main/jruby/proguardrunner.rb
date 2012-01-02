@@ -1,5 +1,5 @@
 require 'java'
-require 'proguard'
+require 'proguard_cache_requires'
 
 module ProguardRunner
   import Java::proguard
