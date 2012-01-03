@@ -7,7 +7,7 @@ object ProguardCache extends Plugin {
   }
 
   val proguardCacheBuild = TaskKey[Unit]("proguard-cache-build", "build the jar")
-  
+
   val proguardCacheBase = SettingKey[File]("proguard-cache-base", "path to the directory containing the proguard cache plugin source")
   val proguardCacheRubyLib = SettingKey[File]("proguard-cache-ruby-lib", "path to the directory containing the jruby library")
   val proguardCacheStorage = SettingKey[File]("proguard-cache-storage", "path to the directory to store dependency files")
@@ -20,11 +20,17 @@ object ProguardCache extends Plugin {
 
   lazy val buildProguardCachedJar = (proguardCacheBase, proguardCacheRubyLib, sourceDirectories in Compile, classDirectory in Compile, proguardCacheStorage, proguardCacheConfigFile) map {
     (pcb, pcrbl, sd, cd, cacheDestination, proguardCacheConfigFile) =>
-    println("building?!" + sd + cd + cacheDestination)
-    val pc = new com.restphone.ProguardCache
-    println("sgotasf")
-    pc.build_dependency_files_and_final_jar(List(cacheDestination), proguardCacheConfigFile, "/tmp/out.jar", "target/proguard_cache", None)
-    ()
+      println("building?!" + sd + cd + cacheDestination)
+
+      val oldContextClassLoader = Thread.currentThread().getContextClassLoader
+      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader())
+
+      val pc = new com.restphone.ProguardCache
+      println("sgotasf")
+      pc.build_dependency_files_and_final_jar(List(cacheDestination), proguardCacheConfigFile, "/tmp/out.jar", "target/proguard_cache", None)
+
+      Thread.currentThread().setContextClassLoader(oldContextClassLoader)
+      ()
   }
 }
 //
