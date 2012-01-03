@@ -119,6 +119,7 @@ Example: jruby -S rake -T -v proguard[proguard_android_scala.config,proguard_cac
 
   #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), "proguard_config/proguard_android_scala.config.unix", "/tmp/out.jar", "target/proguard_cache"
   def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir = nil, cache_jar_pattern = nil
+    puts "in ruby"
     result = build_proguard_dependencies input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern
     run_proguard result
   end

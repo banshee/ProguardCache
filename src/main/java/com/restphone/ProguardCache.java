@@ -134,6 +134,7 @@ public class ProguardCache extends RubyObject  {
             "\n" +
             "  #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), \"proguard_config/proguard_android_scala.config.unix\", \"/tmp/out.jar\", \"target/proguard_cache\"\n" +
             "  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir = nil, cache_jar_pattern = nil\n" +
+            "    puts \"in ruby\"\n" +
             "    result = build_proguard_dependencies input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern\n" +
             "    run_proguard result\n" +
             "  end\n" +
