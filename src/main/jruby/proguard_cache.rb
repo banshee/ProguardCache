@@ -6,6 +6,8 @@ require 'proguardrunner'
 require 'pathname'
 require 'fileutils'
 
+java_package 'com.restphone'
+
 class ProguardCache
   def proguard_output pattern, checksum
     pattern.sub("CKSUM", checksum)
