@@ -12,10 +12,10 @@
 -injars /Users/james/lib/scala-2.9.1.final/lib/scala-library.jar(!META-INF/MANIFEST.MF,!library.properties)
 
 # Change where you want the output jar.  Note that CKSUM will be replace by an actual checksum
--outjar ../ScalaSample/proguard_cache/scala-library.CKSUM.jar
+-outjar ../target/proguard_cache/scala-library.CKSUM.jar
 
 # Change injars to point to where you store your own .class files
--injars bin
+-injars ../target/scala-2.9.1
 
 # Point to your own android.jar file
 -libraryjars /Users/james/lib/android-sdk-mac_86/platforms/android-13/android.jar
