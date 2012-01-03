@@ -1,22 +1,35 @@
-require 'rake'
 require 'asm_support'
 require 'asm_support/asm_visitor_harness'
 require 'asm_support/dependency_signature_visitor'
 require 'digest/sha2'
 require 'proguardrunner'
-require 'rake'
+require 'pathname'
+require 'fileutils'
 
 def proguard_output pattern, checksum
   pattern.sub("CKSUM", checksum)
 end
 
-def proto_to_class files
-  files.pathmap("%X.class").sub("proguard_depend/", "bin/")
+# Given a list of directories, return a hash of
+#   directory_name_checksum => [class and jar files relative to the directory]
+def binary_file_directories_to_cache_files dir_list
+  dir_list.inject({}) do |memo, obj|
+    dir_identifier = Digest::SHA512.hexdigest obj.gsub("/", "_")
+    memo.merge dir_identifier => binary_file_directory_to_cache_files(obj)
+  end
 end
 
-def class_to_proto files
-  files.pathmap("%X.proguard_depend").sub("bin/", "proguard_depend/")
+# Given a directory, return a list of relative pathnames as strings
+# that are the .class and .jar files
+def binary_file_directory_to_cache_files dir
+  result = Dir.glob(dir + "/**/*.class")
+  result = result + Dir.glob(dir + "/**/*.jar")
+  d = Pathname.new dir
+  result.map {|f| Pathname.new f}.map {|f| f.relative_path_from d}.map(&:to_s)
 end
+
+#x = binary_file_directories_to_cache_files "/Users/james/.ivy2/cache/org.scala-tools.sbt"
+#pp x
 
 def unique_lines_in_files_as_string files
   (unique_lines_in_files files).join("\n")
@@ -24,6 +37,7 @@ end
 
 def unique_lines_in_files files
   result = files.map {|f| IO.read(f).split(/[\n\r]+/)}.flatten.sort.uniq
+  # This is a hack, and makes the tool tied to just building scala libraries.  Factor it out.
   result.select {|x| x =~ %r(scala/)}
 end
 
@@ -32,27 +46,43 @@ def checksum_of_lines_in_files files
   Digest::SHA512.hexdigest file_contents
 end
 
-rule(/\.proguard_depend$/ => [
-  proc {|task_name| proto_to_class task_name }
-]) do |p|
-  corresponding_classfile = proto_to_class p.name
-  dependencies = AsmSupport::AsmVisitorHarness.build_for_filename(AsmSupport::DependencySignatureVisitor, corresponding_classfile)
-  File.open(p.name, "w") do |f|
+def build_dependencies_for_file dependency_file, binary_file
+  FileUtils.mkdir_p dependency_file.dirname
+  dependencies = AsmSupport::AsmVisitorHarness.build_for_filename(AsmSupport::DependencySignatureVisitor, binary_file.to_s)
+  File.open(dependency_file, "w") do |f|
     f.write dependencies.values.first.keys.sort.uniq.join("\n")
   end
 end
 
-classfiles = FileList[%w(bin/**/*.class)].sort
-proguard_dependency_files = class_to_proto classfiles
-
-(proguard_dependency_files).each do |d|
-  matching_directory = (d.pathmap "%d")
-  file d => matching_directory
-  directory matching_directory
-  file d => (proto_to_class d)
+def build_dependency_files input_directories, cache_dir
+  cache_dir_pathname = Pathname.new cache_dir
+  FileUtils.mkdir_p cache_dir
+  result = []
+  input_directories.each do |d|
+    dir_identifier = Digest::SHA512.hexdigest d.gsub("/", "_")
+    bin_files = binary_file_directory_to_cache_files d
+    bin_files.each do |bf|
+      full_pathname_for_binary_file = Pathname.new(d) + bf
+      full_pathname_for_dependency_file = cache_dir_pathname + dir_identifier + (bf.to_s + ".proto_depend")
+      is_current = FileUtils.uptodate? full_pathname_for_dependency_file, [full_pathname_for_binary_file]
+      if !is_current
+        build_dependencies_for_file full_pathname_for_dependency_file, full_pathname_for_binary_file
+      end
+      result << full_pathname_for_dependency_file
+    end
+  end
+  result
 end
 
-desc "Build a proguarded scala library.  Arguments are:
+# For easy running under jirb
+def go
+  result = build_dependency_files %w(target project), "cachestuff"
+  pp result
+end
+
+go
+
+"Build a proguarded scala library.  Arguments are:
 proguard_file: The proguard config file
 destination_jar: The final, proguarded jar file
 cache_jar_pattern: The file name of the cached jars
@@ -60,9 +90,15 @@ cache_dir: Where the cached jars are stored
 
 Example: jruby -S rake -T -v proguard[proguard_android_scala.config,proguard_cache/scala-proguard.jar]
 "
-task :proguard, [:proguard_file, :destination_jar, :cache_jar_pattern, :cache_dir] => :output do |t, args|
-  args.with_defaults :proguard_file => 'proguard_android_scala.config', :destination_jar => "proguard_cache/scala-library-proguarded.jar", :cache_jar_pattern => "proguard_cache/scala-library.CKSUM.jar", :cache_dir => "proguard_cache"
-  mkdir_p args.cache_dir if !File.exists? args.cache_dir
+
+def do_proguard input_directories, proguard_file, destination_jar, cache_jar_pattern, cache_dir
+  proguard_file ||= 'proguard_android_scala.config'
+  destination_jar ||= "proguard_cache/scala-library-proguarded.jar"
+  cache_jar_pattern ||= "proguard_cache/scala-library.CKSUM.jar"
+  cache_dir ||= "proguard_cache"
+
+  proguard_dependency_files = build_dependency_files input_directories, cache_dir
+
   dependency_checksum = checksum_of_lines_in_files(proguard_dependency_files + [args[:proguard_file]])
   proguard_destination_file = proguard_output args[:cache_jar_pattern], dependency_checksum
   if !File.exists? proguard_destination_file
@@ -77,7 +113,3 @@ task :proguard, [:proguard_file, :destination_jar, :cache_jar_pattern, :cache_di
     f.write contents
   end
 end
-
-file :output => proguard_dependency_files
-task :proguard => :output
-task :default => [:proguard]
