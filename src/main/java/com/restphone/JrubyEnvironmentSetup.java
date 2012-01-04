@@ -14,16 +14,28 @@ public class JrubyEnvironmentSetup extends RubyObject  {
 
     static {
         String source = new StringBuilder("require 'java'\n" +
+            "require 'pathname'\n" +
             "\n" +
             "java_package 'com.restphone'\n" +
             "\n" +
             "class JrubyEnvironmentSetup\n" +
+            "  java_signature 'void addIvyDirectoryToLoadPath(String dir)'\n" +
+            "  def self.add_ivy_directory_to_load_path dir\n" +
+            "    all_jars = Dir.glob(dir + \"/**/*.jar\")\n" +
+            "    all_jars.each do |j|\n" +
+            "      f = Pathname.new j\n" +
+            "      case j\n" +
+            "      when /asm-all-3.3.1.jar/, /jruby-complete-1.6.5.1.jar/, /proguard-base-4.6.jar/\n" +
+            "        $LOAD_PATH << f.parent\n" +
+            "      end\n" +
+            "    end\n" +
+            "  end\n" +
+            "\n" +
             "  java_signature 'void addToLoadPath(String file)'\n" +
             "  def self.add_to_load_path file\n" +
             "    $LOAD_PATH << file\n" +
             "  end\n" +
             "end\n" +
-            "\n" +
             "").toString();
         __ruby__.executeScript(source, "src/main/jruby/jruby_environment_setup.rb");
         RubyClass metaclass = __ruby__.getClass("JrubyEnvironmentSetup");
@@ -65,6 +77,14 @@ public class JrubyEnvironmentSetup extends RubyObject  {
     public JrubyEnvironmentSetup() {
         this(__ruby__, __metaclass__);
         RuntimeHelpers.invoke(__ruby__.getCurrentContext(), this, "initialize");
+    }
+
+    
+    public static void addIvyDirectoryToLoadPath(String dir) {
+        IRubyObject ruby_dir = JavaUtil.convertJavaToRuby(__ruby__, dir);
+        IRubyObject ruby_result = RuntimeHelpers.invoke(__ruby__.getCurrentContext(), __metaclass__, "add_ivy_directory_to_load_path", ruby_dir);
+        return;
+
     }
 
     
