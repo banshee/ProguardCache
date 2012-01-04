@@ -15,10 +15,6 @@ public class ProguardCacheRuby extends RubyObject  {
     static {
         String source = new StringBuilder("require 'java'\n" +
             "\n" +
-            "$LOAD_PATH << '/Users/james/.ivy2/cache/asm/asm-all/jars'\n" +
-            "$LOAD_PATH << '/Users/james/.ivy2/cache/net.sf.proguard/proguard-base/jars'\n" +
-            "$LOAD_PATH << '/Users/james/workspace/ProguardCache/src/main/jruby'\n" +
-            "\n" +
             "require 'proguard_cache_requires'\n" +
             "require 'asm_support'\n" +
             "require 'asm_support/asm_visitor_harness'\n" +
@@ -140,6 +136,7 @@ public class ProguardCacheRuby extends RubyObject  {
             "\n" +
             "  #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), \"proguard_config/proguard_android_scala.config.unix\", \"/tmp/out.jar\", \"target/proguard_cache\"\n" +
             "  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern\n" +
+            "    puts \"load pathsias is \" + $LOAD_PATH.join(\", \")\n" +
             "    result = build_proguard_dependencies input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern\n" +
             "    run_proguard result\n" +
             "  end\n" +
