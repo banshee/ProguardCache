@@ -1,3 +1,10 @@
+require 'java'
+
+$LOAD_PATH << '/Users/james/.ivy2/cache/asm/asm-all/jars'
+$LOAD_PATH << '/Users/james/.ivy2/cache/net.sf.proguard/proguard-base/jars'
+$LOAD_PATH << '/Users/james/workspace/ProguardCache/src/main/jruby'
+
+require 'proguard_cache_requires'
 require 'asm_support'
 require 'asm_support/asm_visitor_harness'
 require 'asm_support/dependency_signature_visitor'
@@ -8,7 +15,7 @@ require 'fileutils'
 
 java_package 'com.restphone'
 
-class ProguardCache
+class ProguardCacheRuby
   def proguard_output pattern, checksum
     pattern.sub("CKSUM", checksum)
   end
@@ -111,15 +118,13 @@ Example: jruby -S rake -T -v proguard[proguard_android_scala.config,proguard_cac
 
   def run_proguard args
     if !File.exists?(args[:proguard_destination_file])
-      puts "proguard destination file is " + args[:proguard_destination_file]
       ProguardRunner.execute_proguard(:config_file => args[:proguard_config_file], :cksum => ".#{args[:dependency_checksum]}")
       FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true
     end
   end
 
   #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), "proguard_config/proguard_android_scala.config.unix", "/tmp/out.jar", "target/proguard_cache"
-  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir = nil, cache_jar_pattern = nil
-    puts "in ruby"
+  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern
     result = build_proguard_dependencies input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern
     run_proguard result
   end

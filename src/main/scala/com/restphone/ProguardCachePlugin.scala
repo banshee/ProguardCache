@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 
 object ProguardCache extends Plugin {
-  object SbtJRubySettings {
+  object Settings {
     lazy val settings = proguardCacheSettings
   }
 
@@ -12,27 +12,36 @@ object ProguardCache extends Plugin {
   val proguardCacheRubyLib = SettingKey[File]("proguard-cache-ruby-lib", "path to the directory containing the jruby library")
   val proguardCacheStorage = SettingKey[File]("proguard-cache-storage", "path to the directory to store dependency files")
   val proguardCacheConfigFile = SettingKey[File]("proguard-cache-config-file", "path to the proguard configuration file")
+  val proguardCacheFinalJar = SettingKey[File]("proguard-cache-final-jar", "path to the final jarfile")
 
   lazy val proguardCacheSettings = Seq(
     proguardCacheBase := file("/must/specify/this"),
     proguardCacheRubyLib <<= proguardCacheBase(_ / "src" / "main" / "jruby"),
-    proguardCacheBuild <<= buildProguardCachedJar)
+    proguardCacheBuild <<= buildProguardCachedJar,
+    proguardCacheStorage <<= cacheDirectory(_ / "proguard_cache"))
 
-  lazy val buildProguardCachedJar = (proguardCacheBase, proguardCacheRubyLib, sourceDirectories in Compile, classDirectory in Compile, proguardCacheStorage, proguardCacheConfigFile) map {
-    (pcb, pcrbl, sd, cd, cacheDestination, proguardCacheConfigFile) =>
-      println("building?!" + sd + cd + cacheDestination)
-
-      val oldContextClassLoader = Thread.currentThread().getContextClassLoader
-      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader())
-
-      val pc = new com.restphone.ProguardCache
-      println("sgotasf")
-      pc.build_dependency_files_and_final_jar(List(cacheDestination), proguardCacheConfigFile, "/tmp/out.jar", "target/proguard_cache", None)
-
-      Thread.currentThread().setContextClassLoader(oldContextClassLoader)
-      ()
-  }
+  lazy val buildProguardCachedJar = (
+    proguardCacheBase,
+    proguardCacheRubyLib,
+    classDirectory in Compile,
+    proguardCacheStorage,
+    proguardCacheConfigFile,
+    proguardCacheFinalJar) map {
+      (pcb, pcrbl, classDirectoryValue, proguardCacheStorageValue, proguardCacheConfigFileValue, proguardCacheFinalJarValue) =>
+        val oldContextClassLoader = Thread.currentThread().getContextClassLoader
+        
+        // SBT doesn't set the thread context class loader.  JRuby depends on it, so set it and then restore to the old value
+        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader())
+        
+        val pc = new com.restphone.ProguardCacheRuby
+        pc.build_dependency_files_and_final_jar(
+          List(classDirectoryValue.toString).toArray,
+          proguardCacheConfigFileValue.toString,
+          proguardCacheFinalJarValue.toString,
+          proguardCacheStorageValue.toString,
+          proguardCacheStorageValue.toString + "/scala-library.CKSUM.jar")
+        
+          Thread.currentThread().setContextClassLoader(oldContextClassLoader)
+        ()
+    }
 }
-//
-//  #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), "proguard_config/proguard_android_scala.config.unix", "/tmp/out.jar", "target/proguard_cache"
-//  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir = nil, cache_jar_pattern = nil

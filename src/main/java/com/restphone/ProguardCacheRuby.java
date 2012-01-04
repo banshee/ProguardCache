@@ -8,12 +8,19 @@ import org.jruby.javasupport.JavaUtil;
 import org.jruby.RubyClass;
 
 
-public class ProguardCache extends RubyObject  {
+public class ProguardCacheRuby extends RubyObject  {
     private static final Ruby __ruby__ = Ruby.getGlobalRuntime();
     private static final RubyClass __metaclass__;
 
     static {
-        String source = new StringBuilder("require 'asm_support'\n" +
+        String source = new StringBuilder("require 'java'\n" +
+            "\n" +
+            "$LOAD_PATH << '/Users/james/.ivy2/cache/asm/asm-all/jars'\n" +
+            "$LOAD_PATH << '/Users/james/.ivy2/cache/net.sf.proguard/proguard-base/jars'\n" +
+            "$LOAD_PATH << '/Users/james/workspace/ProguardCache/src/main/jruby'\n" +
+            "\n" +
+            "require 'proguard_cache_requires'\n" +
+            "require 'asm_support'\n" +
             "require 'asm_support/asm_visitor_harness'\n" +
             "require 'asm_support/dependency_signature_visitor'\n" +
             "require 'digest/sha2'\n" +
@@ -23,7 +30,7 @@ public class ProguardCache extends RubyObject  {
             "\n" +
             "java_package 'com.restphone'\n" +
             "\n" +
-            "class ProguardCache\n" +
+            "class ProguardCacheRuby\n" +
             "  def proguard_output pattern, checksum\n" +
             "    pattern.sub(\"CKSUM\", checksum)\n" +
             "  end\n" +
@@ -126,24 +133,22 @@ public class ProguardCache extends RubyObject  {
             "\n" +
             "  def run_proguard args\n" +
             "    if !File.exists?(args[:proguard_destination_file])\n" +
-            "      puts \"proguard destination file is \" + args[:proguard_destination_file]\n" +
             "      ProguardRunner.execute_proguard(:config_file => args[:proguard_config_file], :cksum => \".#{args[:dependency_checksum]}\")\n" +
             "      FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true\n" +
             "    end\n" +
             "  end\n" +
             "\n" +
             "  #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), \"proguard_config/proguard_android_scala.config.unix\", \"/tmp/out.jar\", \"target/proguard_cache\"\n" +
-            "  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir = nil, cache_jar_pattern = nil\n" +
-            "    puts \"in ruby\"\n" +
+            "  def build_dependency_files_and_final_jar input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern\n" +
             "    result = build_proguard_dependencies input_directories, proguard_config_file, destination_jar, cache_dir, cache_jar_pattern\n" +
             "    run_proguard result\n" +
             "  end\n" +
             "end\n" +
             "").toString();
         __ruby__.executeScript(source, "src/main/jruby/proguard_cache.rb");
-        RubyClass metaclass = __ruby__.getClass("ProguardCache");
-        metaclass.setRubyStaticAllocator(ProguardCache.class);
-        if (metaclass == null) throw new NoClassDefFoundError("Could not load Ruby class: ProguardCache");
+        RubyClass metaclass = __ruby__.getClass("ProguardCacheRuby");
+        metaclass.setRubyStaticAllocator(ProguardCacheRuby.class);
+        if (metaclass == null) throw new NoClassDefFoundError("Could not load Ruby class: ProguardCacheRuby");
         __metaclass__ = metaclass;
     }
 
@@ -154,7 +159,7 @@ public class ProguardCache extends RubyObject  {
      * @param ruby The JRuby instance this object will belong to
      * @param metaclass The RubyClass representing the Ruby class of this object
      */
-    private ProguardCache(Ruby ruby, RubyClass metaclass) {
+    private ProguardCacheRuby(Ruby ruby, RubyClass metaclass) {
         super(ruby, metaclass);
     }
 
@@ -166,7 +171,7 @@ public class ProguardCache extends RubyObject  {
      * @param metaclass The RubyClass representing the Ruby class of this object
      */
     public static IRubyObject __allocate__(Ruby ruby, RubyClass metaClass) {
-        return new ProguardCache(ruby, metaClass);
+        return new ProguardCacheRuby(ruby, metaClass);
     }
         
     /**
@@ -177,7 +182,7 @@ public class ProguardCache extends RubyObject  {
      * @param ruby The JRuby instance this object will belong to
      * @param metaclass The RubyClass representing the Ruby class of this object
      */
-    public ProguardCache() {
+    public ProguardCacheRuby() {
         this(__ruby__, __metaclass__);
         RuntimeHelpers.invoke(__ruby__.getCurrentContext(), this, "initialize");
     }
