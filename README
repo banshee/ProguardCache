@@ -20,3 +20,8 @@ CLASSPATH=~/workspace/experiments/RubyProject jruby -I ~/workspace/ProguardCache
 Source
 
 Complete source is available from https://github.com/banshee/ProguardCache
+
+----
+jrubyc
+
+jrubyc --java -t src/main/java src/main/jruby/jruby_environment_setup.rb ; jrubyc --java -t src/main/java src/main/jruby/proguard_cache.rb ; ( cd ~/workspace/experiments/pcache/ ; sbt compile proguard-cache-build )
