@@ -20,7 +20,6 @@ public class JrubyEnvironmentSetup extends RubyObject  {
             "class JrubyEnvironmentSetup\n" +
             "  java_signature 'void addToLoadPath(String file)'\n" +
             "  def self.add_to_load_path file\n" +
-            "    puts \"adding to load file \" + file\n" +
             "    $LOAD_PATH << file\n" +
             "  end\n" +
             "end\n" +
