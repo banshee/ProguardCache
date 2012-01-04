@@ -34,9 +34,7 @@ object ProguardCache extends Plugin {
         // SBT doesn't set the thread context class loader.  JRuby depends on it, so set it and then restore to the old value
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader())
         
-        println("asdfasfefr")
         ((managedClasspathValue map {_.data.getParent}) ++ List(proguardCacheRubyLibValue)) map {_.toString} map com.restphone.JrubyEnvironmentSetup.addToLoadPath
-        println("alldone")
         
         val pc = new com.restphone.ProguardCacheRuby
         pc.build_dependency_files_and_final_jar(
