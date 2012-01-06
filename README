@@ -1,20 +1,59 @@
+WHAT IS ProguardCache?
+
+Normally when you're using scala on Android, you need to run Proguard to reduce the size of your binary.  Dalvik currently has a limit
+of 64k call sites (method definitions and method calls).  The standard scala library blows that limit.  So to use scala at all, you have
+to run Proguard every time.
+
+This library caches Proguard runs so you get a collection of scala libraries. It does that by:
+
+* Using asm, detect all calls to the scala libraries by your code.
+* Calculate a checksum of the list of calls to the scala library.
+* Check to see if there's an existing cached copy of the scala library that matches that checksum.
+* If so, use it!  
+* If not, build a new scala library, put it in the cache, and install it
+
+In theory, this should substantially reduce the number of times you need to run Proguard while you're developing.
+
+---
+
+REQUIREMENTS
+
+This version is an addon to the popular android-plugin library at https://github.com/jberkel/android-plugin.  You'll need that first. 
+
 SETUP
 
 ---
-Copy the sample configuration to your project directory:
 
-cp ~/workspace/ProguardCache/proguard_android_scala.config.* .
-cp ~/workspace/ProguardCache/rakefile_sample.rb rakefile.rb
+1.  Get the source (required)
+
+Check out the repository to your local filesystem:
+
+git clone git://github.com/banshee/ProguardCache.git
+
+Right now, you need a local checkout for the plugin to work.  (The JRuby setup needs full paths to 
+files it includes, so a jar doesn't work yet.)
 
 ---
-Edit the proguard_android_scala.config file to point to your own code.
+
+2.  Copy and modify the configuration files
+
+The doc directory has two files you need to copy to your project:
+
+build.sbt : a sample build.sbt 
+project/project/ProguardCache.scala : the file to include the ProguardCache plugin.  
+  (Notice that you want to put ProguardCache.scala in project/project - two project directories.)
+
+Both of these files need to be edited to match your configuration.  The comments in those
+files tell you what should be changed.
 
 ---
-Source
 
-Complete source is available from https://github.com/banshee/ProguardCache
+3.  Build your project
 
-----
-jrubyc
+sbt compile proguard-cache-build android:package-debug
 
-jrubyc --java -t src/main/java src/main/jruby/jruby_environment_setup.rb ; jrubyc --java -t src/main/java src/main/jruby/proguard_cache.rb ; ( cd ~/workspace/experiments/pcache/ ; sbt compile proguard-cache-build )
+The plugin provides a new sbt command: proguard-cache-build.  It detects whether or not your changes require building a new scala library jarfile.
+If it doesn't detect changes, it won't run proguard - a big time savings.
+
+The downside right now is that you don't want to use both this plugin and the normal android-plugin's proguard run.  When and if you want
+to do a final proguard run across all your code, you'll need to take out this plugin from build.sbt.

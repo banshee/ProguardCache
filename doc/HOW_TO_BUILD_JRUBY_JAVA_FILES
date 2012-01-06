@@ -1,0 +1,5 @@
+# TODO: this step is manual and should be automatic.
+#
+# You only need to do this if you change .rb files; it's not normally necessary.
+
+jrubyc --java -t src/main/java src/main/jruby/jruby_environment_setup.rb ; jrubyc --java -t src/main/java src/main/jruby/proguard_cache.rb
