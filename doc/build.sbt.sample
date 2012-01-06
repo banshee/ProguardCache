@@ -1,0 +1,10 @@
+Seq(ProguardCache.Settings.settings: _*)
+
+proguardCacheBase := file("/Users/james/workspace/ProguardCache")
+
+proguardCacheConfigFile := file("proguard.conf")
+
+proguardCacheFinalJar := file("target/james.jar")
+
+logLevel := Level.Debug
+
