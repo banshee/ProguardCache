@@ -5,3 +5,5 @@ libraryDependencies ++= Seq(
 )
 
 sbtPlugin := true
+
+version := 0.1
