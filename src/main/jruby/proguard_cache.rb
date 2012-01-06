@@ -49,7 +49,7 @@ class ProguardCacheRuby
 
   def checksum_of_lines_in_files files
     file_contents = (unique_lines_in_files_as_string files)
-    Digest::SHA512.hexdigest file_contents
+    Digest::SHA1.hexdigest file_contents
   end
 
   def build_dependencies_for_file dependency_file, binary_file
@@ -65,7 +65,7 @@ class ProguardCacheRuby
     FileUtils.mkdir_p cache_dir
     result = []
     input_directories.each do |d|
-      dir_identifier = Digest::SHA512.hexdigest d.gsub("/", "_")
+      dir_identifier = Digest::SHA1.hexdigest d.gsub("/", "_")
       bin_files = binary_file_directory_to_cache_files d
       bin_files.each do |bf|
         full_pathname_for_binary_file = Pathname.new(d) + bf
@@ -115,8 +115,8 @@ Example: jruby -S rake -T -v proguard[proguard_android_scala.config,proguard_cac
   def run_proguard args
     if !File.exists?(args[:proguard_destination_file])
       ProguardRunner.execute_proguard(:config_file => args[:proguard_config_file], :cksum => ".#{args[:dependency_checksum]}")
-      FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true
     end
+    FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true
   end
 
   #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), "proguard_config/proguard_android_scala.config.unix", "/tmp/out.jar", "target/proguard_cache"

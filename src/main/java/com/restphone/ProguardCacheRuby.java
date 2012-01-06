@@ -130,8 +130,8 @@ public class ProguardCacheRuby extends RubyObject  {
             "  def run_proguard args\n" +
             "    if !File.exists?(args[:proguard_destination_file])\n" +
             "      ProguardRunner.execute_proguard(:config_file => args[:proguard_config_file], :cksum => \".#{args[:dependency_checksum]}\")\n" +
-            "      FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true\n" +
             "    end\n" +
+            "    FileUtils.install args[:proguard_destination_file], args[:destination_jar], :mode => 0666, :verbose => true\n" +
             "  end\n" +
             "\n" +
             "  #  ProguardCache.new.build_dependency_files_and_final_jar %w(target/scala-2.9.1), \"proguard_config/proguard_android_scala.config.unix\", \"/tmp/out.jar\", \"target/proguard_cache\"\n" +
