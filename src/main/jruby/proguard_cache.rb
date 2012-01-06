@@ -20,7 +20,7 @@ class ProguardCacheRuby
   #   directory_name_checksum => [class and jar files relative to the directory]
   def binary_file_directories_to_cache_files dir_list
     dir_list.inject({}) do |memo, obj|
-      dir_identifier = Digest::SHA512.hexdigest obj.gsub("/", "_")
+      dir_identifier = Digest::SHA1.hexdigest obj.gsub("/", "_")
       memo.merge dir_identifier => binary_file_directory_to_cache_files(obj)
     end
   end

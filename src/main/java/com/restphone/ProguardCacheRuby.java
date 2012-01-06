@@ -35,7 +35,7 @@ public class ProguardCacheRuby extends RubyObject  {
             "  #   directory_name_checksum => [class and jar files relative to the directory]\n" +
             "  def binary_file_directories_to_cache_files dir_list\n" +
             "    dir_list.inject({}) do |memo, obj|\n" +
-            "      dir_identifier = Digest::SHA512.hexdigest obj.gsub(\"/\", \"_\")\n" +
+            "      dir_identifier = Digest::SHA1.hexdigest obj.gsub(\"/\", \"_\")\n" +
             "      memo.merge dir_identifier => binary_file_directory_to_cache_files(obj)\n" +
             "    end\n" +
             "  end\n" +
@@ -64,7 +64,7 @@ public class ProguardCacheRuby extends RubyObject  {
             "\n" +
             "  def checksum_of_lines_in_files files\n" +
             "    file_contents = (unique_lines_in_files_as_string files)\n" +
-            "    Digest::SHA512.hexdigest file_contents\n" +
+            "    Digest::SHA1.hexdigest file_contents\n" +
             "  end\n" +
             "\n" +
             "  def build_dependencies_for_file dependency_file, binary_file\n" +
@@ -80,7 +80,7 @@ public class ProguardCacheRuby extends RubyObject  {
             "    FileUtils.mkdir_p cache_dir\n" +
             "    result = []\n" +
             "    input_directories.each do |d|\n" +
-            "      dir_identifier = Digest::SHA512.hexdigest d.gsub(\"/\", \"_\")\n" +
+            "      dir_identifier = Digest::SHA1.hexdigest d.gsub(\"/\", \"_\")\n" +
             "      bin_files = binary_file_directory_to_cache_files d\n" +
             "      bin_files.each do |bf|\n" +
             "        full_pathname_for_binary_file = Pathname.new(d) + bf\n" +
