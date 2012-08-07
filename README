@@ -1,3 +1,23 @@
+WARNING: This sbt plugin hasn't been updated for a while.  The Eclipse plugin (https://github.com/banshee/AndroidProguardScala) is much more current.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 WHAT IS ProguardCache?
 
 Normally when you're using scala on Android, you need to run Proguard to reduce the size of your binary.  Dalvik currently has a limit
