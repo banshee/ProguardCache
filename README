@@ -77,3 +77,5 @@ If it doesn't detect changes, it won't run proguard - a big time savings.
 
 The downside right now is that you don't want to use both this plugin and the normal android-plugin's proguard run.  When and if you want
 to do a final proguard run across all your code, you'll need to take out this plugin from build.sbt.
+
+Join the chat at https://gitter.im/banshee/ProguardCache
